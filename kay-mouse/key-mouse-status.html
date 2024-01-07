@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyPress Marquee</title>
+    <style>
+        .marquee {
+            font-family: monospace;
+            white-space: pre;
+            border: 1px solid black;
+            width: 7000px;
+        }
+
+        #box {
+            width: 7100px;
+            height: 600px;
+            background-color: blanchedalmond;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+
+<table>
+    <tr>
+        <td><div id="w" class="marquee"></div></td><td>w</td>
+    </tr>
+
+    
+<tr>
+    <td><div id="s" class="marquee"></div></td><td>s</td>
+</tr>
+
+
+<tr>
+    <td><div id="a" class="marquee"></div></td><td>a</td>
+</tr>
+
+
+<tr>
+    <td><div id="d" class="marquee"></div></td><td>d</td>
+</tr>
+
+<tr></tr>
+
+
+
+<tr>
+    <td><div id="~" class="marquee"></div></td><td>tab</td>
+</tr>
+
+
+<tr>
+    <td><div id="!" class="marquee"></div></td><td>caps</td>
+</tr>
+
+
+<tr>
+    <td><div id="@" class="marquee"></div></td><td>shift</td>
+</tr>
+
+
+<tr>
+    <td><div id="#" class="marquee"></div></td><td>ctrl</td>
+</tr>
+
+
+<tr>
+    <td><div id="$" class="marquee"></div></td><td>alt</td>
+</tr>
+
+
+<tr>
+    <td><div id="%" class="marquee"></div></td><td>空白</td>
+</tr>
+
+
+
+
+<tr>
+    <td><div id="{" class="marquee"></div></td><td>滑鼠左鍵</td>
+</tr>
+<tr>
+    <td><div id="}" class="marquee"></div></td><td>滑鼠右鍵</td>
+</tr>
+
+
+
+<tr>
+    <td><div id="'" class="marquee"></div></td><td>上</td>
+</tr>
+<tr>
+    <td><div id="." class="marquee"></div></td><td>下</td>
+</tr>
+<tr>
+    <td><div id="[" class="marquee"></div></td><td>左</td>
+</tr>
+<tr>
+    <td><div id="]" class="marquee"></div></td><td>右</td>
+</tr>
+
+
+
+
+</table>
+        <div id="msg" style="font-size: 32px; text-align: right;"></div>
+
+    </div>
+
+    <script>
+
+        const convertCharMap = {
+            uu: "\"",
+            ll: "<"
+        }
+
+        class KeyData {
+            constructor(keyChar) {
+                this.isPressed = false;
+
+                this._element = document.getElementById(keyChar);
+
+                if(!this._element) console.error(123);
+                this._keyChar = keyChar;
+                this._queue = Array(1000).fill(' ');
+            }
+
+
+            get keyChar() {
+                return this._keyChar;
+            }
+
+            refreshContent() {
+                const c = convertCharMap[this._keyChar]
+                    ? convertCharMap[this._keyChar]
+                    : this._keyChar
+                this._queue.push(this.isPressed ? c : " ");
+                this._queue.shift();
+                this._element.textContent = this._queue.join('');
+                // console.log(this._element.textContent);
+            }
+        }
+
+        const keyMap = {
+            "w": new KeyData("w"),
+            "s": new KeyData("s"),
+            "a": new KeyData("a"),
+            "d": new KeyData("d"),
+
+            "tab": new KeyData("~"),
+            "capslock": new KeyData("!"),
+            "shift": new KeyData("@"),
+            "control": new KeyData("#"),
+            "alt": new KeyData("$"),
+            " ": new KeyData("%"),
+
+            "mouseLeft": new KeyData("{"),
+            "mouseRight": new KeyData("}"),
+
+
+            "'": new KeyData("'"),
+            ".": new KeyData("."),
+            "[": new KeyData("["),
+            "]": new KeyData("]"),
+
+            // "arrow\"": new KeyData("uu"),
+            // "arrow,": new KeyData(","),
+            // "arrow<": new KeyData("ll"),
+            // "arrow>'": new KeyData(">")
+        };
+
+
+        const lastMousePosition = { x: 0, y: 0 };
+
+
+
+        document.getElementById('box').addEventListener('mousedown', function (event) {
+
+            switch (event.button) {
+                case 0: keyMap["mouseLeft"].isPressed = true; break;
+                case 2: keyMap["mouseRight"].isPressed = true; break;
+                default: break;
+            }
+
+
+            event.preventDefault(); // 阻止 Tab 鍵的預設行為
+
+            event.stopPropagation(); // 阻止事件冒泡
+        });
+
+
+        document.getElementById('box').addEventListener('mouseup', function (event) {
+
+            switch (event.button) {
+                case 0: keyMap["mouseLeft"].isPressed = false; break;
+                case 2: keyMap["mouseRight"].isPressed = false; break;
+                default: break;
+            }
+
+        });
+
+
+
+        document.body.addEventListener('keydown', function (event) {
+            //console.log(`[${event.key}][${keyMap[k].keyChar}]`)
+            document.getElementById("msg").textContent = `[${event.key}]`;
+            const k = event.key.toLowerCase();
+            if (keyMap[k]) {
+                keyMap[k].isPressed = true;
+            }
+
+
+            event.preventDefault(); // 阻止 Tab 鍵的預設行為
+
+            event.stopPropagation(); // 阻止事件冒泡
+        });
+
+
+        document.body.addEventListener('keyup', function (event) {
+            const k = event.key.toLowerCase();
+            if (keyMap[k]) {
+                keyMap[k].isPressed = false;
+            }
+        });
+
+
+        // 監聽滑鼠移動事件
+        document.getElementById('box').addEventListener('mousemove', function (e) {
+            const deltaX = e.clientX - lastMousePosition.x;
+            const deltaY = e.clientY - lastMousePosition.y;
+
+            lastMousePosition.x = e.clientX;
+            lastMousePosition.y = e.clientY;
+
+            //上為負
+            keyMap["'"].isPressed = deltaY < 0;
+            keyMap["."].isPressed = deltaY > 0;
+            keyMap["["].isPressed = deltaX < 0;
+            keyMap["]"].isPressed = deltaX > 0;
+
+        });
+
+        // // 監聽滾輪事件
+        // document.getElementById('box').addEventListener('wheel', function (e) {
+        //     addMessage(`滾輪移動-水平:${e.deltaX},垂直:${e.deltaY}`);
+        // });
+
+
+
+        // 禁止contextmenu事件，以便捕捉滑鼠右鍵事件
+        document.body.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        setInterval(() => {
+            Object.keys(keyMap).forEach(keyLowerCase => {
+                keyMap[keyLowerCase].refreshContent();
+            });
+
+            keyMap["'"].isPressed = false;
+            keyMap["."].isPressed = false;
+            keyMap["["].isPressed = false;
+            keyMap["]"].isPressed = false;
+        }, 10); // 每0.01秒更新一次
+
+
+
+    </script>
+</body>
+
+</html>
