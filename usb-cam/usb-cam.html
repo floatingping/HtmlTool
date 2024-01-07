@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USB Webcam</title>
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
+    <script>
+        function adjustSize() {
+            const ratio = parseFloat(document.getElementById("ratioInput").value);
+            const video = document.getElementById("webcamVideo");
+            const originalWidth = video.videoWidth;
+            const originalHeight = video.videoHeight;
+
+            video.style.width = (originalWidth * ratio) + "px";
+            video.style.height = (originalHeight * ratio) + "px";
+        }
+
+        async function startCamera() {
+            const constraints = {
+                video: {
+                    width: 1980,
+                    height: 1080
+                    //width: 1600,
+                    //height: 900
+                    //width: 800,
+                    //height: 450
+                }
+            };
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('webcamVideo').srcObject = stream;
+                setTimeout(() => {
+                    adjustSize();
+                    document.getElementById('webcamVideo').className = "";
+                }, 500);
+            } catch (error) {
+                console.error("Error accessing the camera.", error);
+            }
+        }
+    </script>
+</head>
+
+<body onload="startCamera()">
+    <h2>USB Webcam</h2>
+    <video id="webcamVideo" autoplay playsinline class="hide"></video>
+
+    <div>
+        <label for="ratioInput">比例 (例如: 0.5, 1.5):</label>
+        <input type="number" id="ratioInput" step="0.01" value="0.5">
+        <button onclick="adjustSize()">調整大小</button>
+    </div>
+</body>
+
+</html>
