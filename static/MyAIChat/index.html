@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="#">
+    <title>MyAIChat</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        
+        <a href="https://platform.openai.com/api-keys" target="_blank">apiKey</a><input v-model="chatGPTData.apiKey"><button @click="saveApiKeyToLocal()">saveApiKeyToLocal</button><br>
+        <a href="https://platform.openai.com/docs/models/continuous-model-upgrades" target="_blank">版本介紹</a><br>
+        <textarea cols="50" rows="8" v-model="codeModelOptions"></textarea><textarea cols="50" rows="8" v-model="modelOptions"></textarea>
+        model<input v-model="chatGPTData.model"><br>
+        temperature<input v-model="chatGPTData.temperature">這個參數控制生成文字的隨機性。數值範圍是 0 到 1。值越高（接近 1），生成的文字越隨機和創意；值越低（接近 0），生成的文字越保守和精確。<br>
+        max_tokens<input v-model="chatGPTData.max_tokens">這個參數決定生成回應的最大字數。你設置的 256 表示回應最多可以包含 256 個 token（包括字詞和標點符號）。<br>
+        top_p<input v-model="chatGPTData.top_p">這個參數控制生成文字時的隨機性。這是一個累積概率的截斷值。設定為 1 表示不使用這個截斷技術，允許模型考慮所有可能的下一個 token。<br>
+        frequency_penalty<input v-model="chatGPTData.frequency_penalty">這個參數控制模型對於重複用詞的懲罰程度。範圍是 -2.0 到 2.0。較高的值會使模型更少重複用詞，較低的值則反之。你設置的 0 表示不對重複用詞進行懲罰。<br>
+        presence_penalty<input v-model="chatGPTData.presence_penalty">這個參數控制模型對於引入新話題或詞彙的懲罰程度。範圍是 -2.0 到 2.0。較高的值會使模型更傾向於引入新話題，較低的值則反之。你設置的 0 表示不對引入新話題進行懲罰。<br>
+        introMessages<br>
+        <textarea cols="50" rows="8" v-model="introMessages"></textarea><button @click="saveIntroMessagesToLocal()">saveIntroMessagesToLocal</button><br>
+        message<br>
+        <textarea cols="50" rows="8" v-model="message"></textarea><button @click="sendAsync()">send</button><br>
+        res<br>
+        <template v-for="(msg, msgIdx) in resMessages" :key="msgIdx">
+            <textarea cols="50" rows="8" v-model="msg"></textarea><br>
+        </template>
+    </div>
+    <script src="./index.js"></script>
+</body>
+
+</html>
